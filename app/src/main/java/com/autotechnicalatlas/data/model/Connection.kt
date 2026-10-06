@@ -15,10 +15,16 @@ enum class ConnectionType {
     MECHANICAL
 }
 
+data class RoutePoint(
+    val x: Float,
+    val y: Float
+)
+
 data class Connection(
     val id: String,
     val fromComponentId: String,
     val toComponentId: String,
     val type: ConnectionType,
-    val label: String = ""
+    val label: String = "",
+    val route: List<RoutePoint> = emptyList()
 )

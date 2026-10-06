@@ -5,8 +5,12 @@ data class Component(
     val name: String,
     val systemId: String,
     val description: String,
+    val shape: String = "block",
     val x: Float = 0f,
     val y: Float = 0f,
-    val z: Float = 0f,
-    val drawingId: String? = null
+    val width: Float = 120f,
+    val height: Float = 70f,
+    val layer: Int = 0,
+    val verified: Boolean = false,
+    val sourceId: String? = null
 )

@@ -3,65 +3,61 @@ package com.autotechnicalatlas
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.autotechnicalatlas.data.model.Vehicle
+import com.autotechnicalatlas.data.repository.AtlasRepository
+import com.autotechnicalatlas.ui.screens.HomeScreen
+import com.autotechnicalatlas.ui.screens.ViewerScreen
+import com.autotechnicalatlas.ui.theme.AtlasTheme
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         setContent {
-            AutoTechnicalAtlasApp()
+            AtlasTheme {
+                AutoTechnicalAtlasApp()
+            }
         }
     }
 }
 
 @Composable
 fun AutoTechnicalAtlasApp() {
+    val context = LocalContext.current
+    val repository = remember(context) { AtlasRepository(context.applicationContext) }
 
-    MaterialTheme {
+    var selectedVehicle by remember { mutableStateOf<Vehicle?>(null) }
+    var refreshToken by remember { mutableIntStateOf(0) }
+    var errorText by remember { mutableStateOf<String?>(null) }
 
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.White
-        ) {
+    val vehicles = remember(refreshToken) { repository.loadVehicles() }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-            ) {
-
-                Text(
-                    text = "AUTO TECHNICAL ATLAS",
-                    modifier = Modifier.padding(20.dp),
-                    fontSize = 20.sp,
-                    color = Color.Black
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Text(
-                        text = "Технический атлас\n\nВыберите автомобиль",
-                        fontSize = 18.sp,
-                        color = Color.DarkGray
-                    )
+    if (selectedVehicle == null) {
+        HomeScreen(
+            vehicles = vehicles,
+            onVehicleSelected = { selectedVehicle = it },
+            onImport = { uri ->
+                runCatching {
+                    repository.importVehicle(uri)
+                    refreshToken++
+                }.onFailure { error ->
+                    errorText = error.message ?: "Ошибка импорта"
                 }
             }
+        )
+    } else {
+        ViewerScreen(
+            vehicle = selectedVehicle!!,
+            onBack = { selectedVehicle = null }
+        )
+    }
+
+    errorText?.let { message ->
+        LaunchedEffect(message) {
+            errorText = null
         }
     }
 }
