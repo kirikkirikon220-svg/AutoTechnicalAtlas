@@ -1,0 +1,61 @@
+name: Auto Technical Atlas - Release APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | sed 's/[^0-9.]//g')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Rename APK
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk \
+             AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoTechnicalAtlas-Release
+          path: AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: Auto Technical Atlas v${{ steps.version.outputs.version }} Build ${{ github.run_number }}
+          generate_release_notes: true
+          files: AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk
