@@ -52,10 +52,15 @@ fun TechnicalCanvas(
         component.y + explodeOffset(component).y
     )
 
-    fun screenToWorld(point: Offset, size: Size): Offset {
-        val dx = (point.x - size.width / 2f - pan.x) / zoom
-        val dy = (point.y - size.height / 2f - pan.y) / zoom
+    fun screenToWorld(
+        point: Offset,
+        width: Float,
+        height: Float
+    ): Offset {
+        val dx = (point.x - width / 2f - pan.x) / zoom
+        val dy = (point.y - height / 2f - pan.y) / zoom
         val angle = Math.toRadians((-rotation).toDouble())
+
         return Offset(
             (dx * cos(angle) - dy * sin(angle)).toFloat(),
             (dx * sin(angle) + dy * cos(angle)).toFloat()
@@ -75,7 +80,11 @@ fun TechnicalCanvas(
                 }
                 .pointerInput(components, zoom, rotation, pan, exploded) {
                     detectTapGestures { tap ->
-                        val world = screenToWorld(tap, size)
+                        val world = screenToWorld(
+                            tap,
+                            size.width.toFloat(),
+                            size.height.toFloat()
+                        )
                         val hit = components.asReversed().firstOrNull { component ->
                             val c = centerOf(component)
                             world.x in (c.x - component.width / 2f)..(c.x + component.width / 2f) &&
