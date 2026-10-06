@@ -2,8 +2,7 @@ name: Auto Technical Atlas - Release APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,11 +10,9 @@ permissions:
 
 jobs:
   build-release:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -27,26 +24,22 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Make Gradle executable
-        run: chmod +x gradlew
+        with:
+          gradle-version: "8.11.1"
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: gradle assembleRelease --no-daemon --stacktrace
 
       - name: Get version
         id: version
-        shell: bash
         run: |
           VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | sed 's/[^0-9.]//g')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Rename APK
-        run: |
-          cp app/build/outputs/apk/release/app-release.apk \
-             AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk
+        run: cp app/build/outputs/apk/release/app-release.apk AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AutoTechnicalAtlas-Release
