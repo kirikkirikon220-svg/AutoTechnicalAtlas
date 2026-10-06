@@ -139,7 +139,7 @@ fun TechnicalCanvas(
                                             p.point.x - tap.x,
                                             p.point.y - tap.y
                                         ) < 48f
-                                    }
+                                    ) {
                                         component to p
                                     } else {
                                         null
@@ -1004,7 +1004,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.ELECTRICAL -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width =
                         if (selected)
                             6f
@@ -1016,11 +1017,11 @@ private fun DrawScope.drawConnection3D(
             )
 
             drawPath(
-                path,
-                Color.White.copy(
+                path = path,
+                color = Color.White.copy(
                     alpha = alpha * 0.9f
                 ),
-                Stroke(
+                style = Stroke(
                     width = 1.6f,
                     cap = StrokeCap.Round
                 )
@@ -1031,7 +1032,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.LIN -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width =
                         if (selected)
                             5f
@@ -1056,7 +1058,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.HYDRAULIC -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width =
                         if (selected)
                             8f
@@ -1077,7 +1080,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.AIR -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width = 5f,
                     pathEffect =
                         PathEffect.dashPathEffect(
@@ -1094,7 +1098,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.EXHAUST -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width = 7f,
                     pathEffect =
                         PathEffect.dashPathEffect(
@@ -1111,7 +1116,8 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.MECHANICAL -> {
             drawPath(
                 path,
-                color                style = Stroke(
+                color,
+                style = Stroke(
                     width =
                         if (selected)
                             8f
