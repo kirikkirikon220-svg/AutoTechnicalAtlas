@@ -27,43 +27,46 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
-      - name: Build Release APK
+      - name: Build Signed APK
         run: |
-          gradle assembleRelease --no-daemon --stacktrace
+          gradle assembleDebug --no-daemon --stacktrace
 
-      - name: Show generated APK files
+      - name: Show APK
         run: |
-          echo "=== APK OUTPUT DIRECTORY ==="
+          echo "=== GENERATED APK ==="
           find app/build/outputs/apk -type f -name "*.apk" -print
-          echo "============================"
+          echo "====================="
 
       - name: Get version
         id: version
         shell: bash
         run: |
           VERSION=$(grep -m1 'versionName' app/build.gradle.kts | sed -E 's/.*versionName *= *"([^"]+)".*/\1/')
+
           if [ -z "$VERSION" ]; then
-            echo "Не удалось определить versionName"
+            echo "ОШИБКА: versionName не найден."
             exit 1
           fi
 
           echo "Detected version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Find generated APK
+      - name: Find signed APK
         id: apk
         shell: bash
         run: |
-          APK=$(find app/build/outputs/apk -type f -name "*.apk" | head -n 1)
+          APK="app/build/outputs/apk/debug/app-debug.apk"
 
-          if [ -z "$APK" ]; then
-            echo "ОШИБКА: APK не найден."
-            echo "Содержимое outputs:"
-            find app/build/outputs -type f -print || true
+          if [ ! -f "$APK" ]; then
+            echo "ОШИБКА: подписанный debug APK не найден."
+            echo "Доступные APK:"
+            find app/build/outputs -type f -name "*.apk" -print || true
             exit 1
           fi
 
-          echo "Найден APK: $APK"
+          echo "Найден подписанный APK:"
+          ls -lh "$APK"
+
           echo "path=$APK" >> "$GITHUB_OUTPUT"
 
       - name: Rename APK
@@ -72,19 +75,22 @@ jobs:
           cp "${{ steps.apk.outputs.path }}" \
              "AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk"
 
-      - name: Verify final APK
+      - name: Verify APK
         shell: bash
         run: |
           FILE="AutoTechnicalAtlas-v${{ steps.version.outputs.version }}.apk"
 
           if [ ! -f "$FILE" ]; then
-            echo "ОШИБКА: итоговый APK не создан."
+            echo "ОШИБКА: APK не создан."
             exit 1
           fi
 
-          echo "Итоговый APK:"
+          echo "=== FINAL APK ==="
           ls -lh "$FILE"
           file "$FILE"
+
+          echo "=== APK SIGNATURE ==="
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$FILE"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
