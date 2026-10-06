@@ -23,6 +23,7 @@ import com.autotechnicalatlas.data.model.ConnectionType
 import com.autotechnicalatlas.data.model.VehicleVisual
 import com.autotechnicalatlas.data.model.VisualPoint
 import kotlin.math.abs
+import kotlin.math.hypot
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -134,10 +135,11 @@ fun TechnicalCanvas(
                                         )
 
                                     if (
-                                        p.point.getDistance(
-                                            tap
+                                        hypot(
+                                            p.point.x - tap.x,
+                                            p.point.y - tap.y
                                         ) < 48f
-                                    ) {
+                                    }
                                         component to p
                                     } else {
                                         null
@@ -1002,8 +1004,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.ELECTRICAL -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width =
                         if (selected)
                             6f
@@ -1030,8 +1031,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.LIN -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width =
                         if (selected)
                             5f
@@ -1056,8 +1056,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.HYDRAULIC -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width =
                         if (selected)
                             8f
@@ -1078,8 +1077,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.AIR -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width = 5f,
                     pathEffect =
                         PathEffect.dashPathEffect(
@@ -1096,8 +1094,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.EXHAUST -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width = 7f,
                     pathEffect =
                         PathEffect.dashPathEffect(
@@ -1114,8 +1111,7 @@ private fun DrawScope.drawConnection3D(
         ConnectionType.MECHANICAL -> {
             drawPath(
                 path,
-                color,
-                Stroke(
+                color                style = Stroke(
                     width =
                         if (selected)
                             8f
