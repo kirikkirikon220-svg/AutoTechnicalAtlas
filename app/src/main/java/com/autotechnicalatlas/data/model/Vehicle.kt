@@ -14,5 +14,6 @@ data class Vehicle(
     val systems: List<VehicleSystem> = emptyList(),
     val components: List<Component> = emptyList(),
     val connections: List<Connection> = emptyList(),
-    val sources: List<TechnicalSource> = emptyList()
+    val sources: List<TechnicalSource> = emptyList(),
+    val visual: VehicleVisual = VehicleVisual.defaultSedan()
 )

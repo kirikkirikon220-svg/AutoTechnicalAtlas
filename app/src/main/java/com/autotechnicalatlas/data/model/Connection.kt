@@ -17,7 +17,8 @@ enum class ConnectionType {
 
 data class RoutePoint(
     val x: Float,
-    val y: Float
+    val y: Float,
+    val z: Float = 0f
 )
 
 data class Connection(
@@ -26,5 +27,7 @@ data class Connection(
     val toComponentId: String,
     val type: ConnectionType,
     val label: String = "",
+    val purpose: String = "",
+    val direction: String = "",
     val route: List<RoutePoint> = emptyList()
 )
